@@ -43,14 +43,7 @@ To install `cronik`, follow these steps:
    import "github.com/trinhminhtriet/cronik"
    ```
 
-4. **Run your project**: Use `go run` to run your project or `go build` to build it.
-   ```sh
-   go run main.go
-   ```
-
 Now you are ready to use `cronik` in your project!
-
-## 💡 Usage
 
 ## 💡 Usage
 
@@ -58,63 +51,52 @@ Here's a quick example of how to use `cronik` to schedule jobs:
 
 1. **Import the package**:
 
-   ```go
-   import (
-       "fmt"
-       "time"
-       "github.com/trinhminhtriet/cronik"
-   )
-   ```
+```go
+import (
+    "fmt"
+    "time"
+    "github.com/trinhminhtriet/cronik"
+)
+```
 
-2. **Create a new scheduler**:
-
-   ```go
-   scheduler := cronik.NewScheduler()
-   ```
-
-3. **Define a job**:
-
-   ```go
-   job := func() {
-       fmt.Println("Job executed at", time.Now())
-   }
-   ```
-
-4. **Schedule the job**:
-
-   - **Periodic Job**: Schedule the job to run every minute.
-
-     ```go
-     scheduler.SchedulePeriodicJob(job, time.Minute)
-     ```
-
-   - **Delayed Job**: Schedule the job to run after a 10-minute delay.
-
-     ```go
-     scheduler.ScheduleDelayedJob(job, 10*time.Minute)
-     ```
-
-   - **Retryable Job**: Schedule the job with retry policy (e.g., retry up to 3 times with a 1-minute interval).
-
-     ```go
-     scheduler.ScheduleRetryableJob(job, 3, time.Minute)
-     ```
-
-   - **Interval Job**: Schedule the job to run at specific intervals (e.g., every 5 minutes).
-     ```go
-     scheduler.ScheduleIntervalJob(job, 5*time.Minute)
-     ```
-
-5. **Start the scheduler**:
+2. **Start the scheduler**:
 
    ```go
    scheduler.Start()
    ```
 
-6. **Stop the scheduler** (when your application is shutting down):
+3. **Cancel the scheduler** (when your application is shutting down):
+
    ```go
-   scheduler.Stop()
+   scheduler.Cancel()
    ```
+
+4. **Schedule a job**:
+
+```go
+// Every 2 minutes
+t.When{Each: "2m"}
+
+// Every 100 milliseconds
+t.When{Every: t.Every(100).Milliseconds()}
+
+// Every hour at :30
+t.When{Every: t.Every(1).Hours(), At: "**:30"}
+
+// Every day at the next beginning of an hour **:00
+t.When{Every: t.Every(1).Days(), At: "**:00"}
+
+// Every 2 weeks on Saturdays at 10:00
+t.When{Every: &t.Every(2).Weeks(), On: t.Sat, At: "10:00"}
+
+// Saturday at 15:00, not repeated
+t.When{Day: t.Sat, At: "15:00"}
+
+// Every week on Sun at 11:00, last run was explicitly given.
+// If your process shuts down at 10:00 on Sunday, it allows scheduler
+// to schedule the job to run in a hour on an immediate restart.
+t.When{LastRun: lastRun, Every: &t.Every(1).Weeks(), On: t.Sun, At: "10:00"}
+```
 
 ## 🤝 How to contribute
 
